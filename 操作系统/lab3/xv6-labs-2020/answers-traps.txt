@@ -1,0 +1,61 @@
+ (1）哪些寄存器包含函数的参数？ 例如，哪个寄存器在main对printf的调用中保留13？
+
+a0 a1 a2 a3... a3保留13
+
+（2）在main的汇编代码中对函数f的调用在哪里？对函数g的调用在哪里？ （提示：编译器可以内联函数。）
+
+没有调用 直接a1=12
+
+（3）函数printf位于哪个地址？
+
+ra=pc=0x30 0x30+1536(0x60)=0x630
+
+（ra）+1536
+
+jalr 1536(ra) # 630 <printf>
+（4）紧随main的printf之后，寄存器ra中的值是什么？ ra是printf返回到main的地址 0x38
+（5）运行以下代码。
+
+unsigned int i = 0x00646c72;
+printf("H%x Wo%s", 57616, &i);
+输出是什么？ 这是一个将字节映射为字符的ASCII表。
+
+输出取决于RISC-V是小端的事实。 如果RISC-V改为big-endian，那么您将i设置为什么才能产生相同的输出？ 您是否需要将57616更改为其他值？
+
+16进制 72 6c 64
+
+ascii码 r l d
+
+%x 是16进制 57616=0xe110
+
+输出 He110 World
+
+改为大端模式
+
+i=0x726c64
+
+不需要修改57616 因为不论大端还是小端，它16进制的表达方式不变
+
+读字符串是地址从小到大递增的
+（6）在以下代码中，'y ='之后将输出什么？ （注意：答案不是一个特定的值。）为什么会发生？
+
+printf("x=%d y=%d", 3);
+取决于对应输入寄存器的值
+
+risc-v 寄存器分配
+
+reg    | name  | saver  | description
+-------+-------+--------+------------
+x0     | zero  |        | hardwired zero
+x1     | ra    | caller | return address
+x2     | sp    | callee | stack pointer
+x3     | gp    |        | global pointer
+x4     | tp    |        | thread pointer
+x5-7   | t0-2  | caller | temporary registers
+x8     | s0/fp | callee | saved register / frame pointer
+x9     | s1    | callee | saved register
+x10-11 | a0-1  | caller | function arguments / return values
+x12-17 | a2-7  | caller | function arguments
+x18-27 | s2-11 | callee | saved registers
+x28-31 | t3-6  | caller | temporary registers
+pc     |       |        | program counter
